@@ -5,13 +5,13 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start" : " nodemon app.js"
+    "start": " nodemon app.js"
   },
-  
   "author": "",
   "license": "ISC",
   "dependencies": {
     "express": "^4.17.3",
-    "nodemon": "^2.0.15"
+    "nodemon": "^2.0.15",
+    "swagger": "^0.7.5"
   }
 }
