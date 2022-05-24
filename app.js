@@ -1,20 +1,19 @@
 require("dotenv").config();
 const express = require("express");
-const app = express();
-const path = require("path");
 const moment = require("moment");
 const axios = require("axios");
-const port = 3000;
+const { DateTime } = require("luxon");
 
-const getRequestTime = () => {
-  const now = moment();
-  const time = now.format("yyyy-MM-DDTHH:mm:ssZ");
-  return time;
-};
-
-app.use(express.urlencoded({ extended: false }));
+const app = express();
+app.use(express.urlencoded({ extended: false }));/* check */
 app.use(express.json());
 
+const port = process.env.PORT ||3000;
+const clientId= process.env.CLIENT_ID;
+const baseURL= process.env.BASE_URL;
+// const tokenPath= process.env.BASE_URL;
+
+/* menu, user and price apis */
 // const maxTables = 10
 // const getTable = (max) => {
 //     return Math.floor(Math.random() * max) +1
@@ -105,74 +104,66 @@ app.use(express.json());
 //     res.send(user)
 // })
 
-app.get("/auth", async (req, res) => {
-  const path =
-    "https://vodapay-gateway.sandbox.vfs.africa/v2/authorizations/applyAuthCode";
-  const headers = {
-    "Content-Type": "application/json",
-    "client-id": process.env.clientId,
-    "request-time": getRequestTime(),
-  };
 
-  const body = {
-    clientId: process.env.clientId,
-    userId: process.env.userId,
-    scopes: "auth_user",
-  };
 
-  const options = {
+const date = ()=> DateTime.now().toISO();
+const getRequestTime = () => {
+  const now = moment();
+  const time = now.format("yyyy-MM-DDTHH:mm:ssZ");
+  return time;
+};
+console.log(date());
+// console.log(getRequestTime);
+
+const requestFunction = async(requestBody,path) =>{
+    const headers = {
+        "Content-Type": "application/json; charset=UTF-8",
+        "client-id": clientId,
+        "request-time": date(),
+        "Signature": "algorithm=RSA256, keyVersion=1, signature=testing_signatur",
+    };
+    
+    const options = {
     method: "POST",
     url: path,
     headers,
-    data: body,
-  };
+    data:requestBody,
+    };
 
-  let response;
-  try {
-    response = await axios(options);
-  } catch (e) {
-    console.error("FAILED");
-    console.error(e.message);
-  }
-  authCode = response.data.authCode;
+    const response = await axios(options);
+    return response.data;
 
-  res.send(response.data);
-});
+}
+
+
 
 app.post("/token", async (req, res) => {
   const { authCode } = req.body;
-  console.log(authCode);
   const path =
-    "https://vodapay-gateway.sandbox.vfs.africa/v2/authorizations/applyToken";
-  const headers = {
-    "Content-Type": "application/json; charset=UTF-8",
-    "client-id": process.env.clientId,
-    "request-time": getRequestTime(),
-    Signature: "algorithm=RSA256, keyVersion=1, signature=testing_signatur",
-  };
+  `${baseURL}/v2/authorizations/applyToken`;
 
   const body = JSON.stringify({
     grantType: "AUTHORIZATION_CODE",
     authCode: authCode,
-  });
+    });
 
-  const options = {
-    method: "POST",
-    url: path,
-    headers,
-    data: body,
-  };
-
-  try {
-    let response = await axios(options);
-    console.log(response);
-    console.log(response.data);
-    res.send(response.data);
-  } catch (e) {
-    console.error("FAILED");
-    console.error(e.message);
-  }
+ res.send(await requestFunction(body,path))
 });
+
+
+app.post("/userDetails", async (req, res) => {
+  const { accessToken } = req.body;
+  const path =
+  `${baseURL}/v2/customers/user/inquiryUserInfo`;
+
+  const body = JSON.stringify({
+    accessToken
+  });
+  let user = await requestFunction(body,path);
+  console.log(user.userInfo);
+ res.send(user.userInfo)
+});
+
 
 app.listen(port, () => {
   console.log(`app listening on port: ${port}`);
