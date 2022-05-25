@@ -1,17 +1,16 @@
 require("dotenv").config();
 const express = require("express");
-const moment = require("moment");
 const axios = require("axios");
 const { DateTime } = require("luxon");
 
 const app = express();
-app.use(express.urlencoded({ extended: false }));/* check */
-app.use(express.json());
-
-const port = process.env.PORT ||3000;
+const port = process.env.PORT || 3000;
 const clientId= process.env.CLIENT_ID;
 const baseURL= process.env.BASE_URL;
-// const tokenPath= process.env.BASE_URL;
+const tokenEndPoint= process.env.TOKEN_END_POINT;
+const userDetailsEndPoint= process.env.USER_DETAILS_END_POINT;
+
+app.use(express.json());
 
 /* menu, user and price apis */
 // const maxTables = 10
@@ -104,16 +103,7 @@ const baseURL= process.env.BASE_URL;
 //     res.send(user)
 // })
 
-
-
 const date = ()=> DateTime.now().toISO();
-const getRequestTime = () => {
-  const now = moment();
-  const time = now.format("yyyy-MM-DDTHH:mm:ssZ");
-  return time;
-};
-console.log(date());
-// console.log(getRequestTime);
 
 const requestFunction = async(requestBody,path) =>{
     const headers = {
@@ -140,27 +130,27 @@ const requestFunction = async(requestBody,path) =>{
 app.post("/token", async (req, res) => {
   const { authCode } = req.body;
   const path =
-  `${baseURL}/v2/authorizations/applyToken`;
+  `${baseURL}${tokenEndPoint}`;
 
   const body = JSON.stringify({
     grantType: "AUTHORIZATION_CODE",
-    authCode: authCode,
+    authCode,
     });
-
- res.send(await requestFunction(body,path))
+  const token = await requestFunction(body,path)
+ res.send(token)
 });
 
 
 app.post("/userDetails", async (req, res) => {
   const { accessToken } = req.body;
   const path =
-  `${baseURL}/v2/customers/user/inquiryUserInfo`;
+  `${baseURL}${userDetailsEndPoint}`;
 
   const body = JSON.stringify({
     accessToken
   });
-  let user = await requestFunction(body,path);
-  console.log(user.userInfo);
+  const user = await requestFunction(body,path);
+  
  res.send(user.userInfo)
 });
 
