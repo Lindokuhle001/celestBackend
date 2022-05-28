@@ -5,13 +5,16 @@ const { DateTime } = require("luxon");
 const jwt = require("jsonwebtoken");
 
 const app = express();
-const port = process.env.PORT || 3000;
-const clientId = process.env.CLIENT_ID;
-const baseURL = process.env.BASE_URL;
-const tokenEndPoint = process.env.TOKEN_END_POINT;
-const userDetailsEndPoint = process.env.USER_DETAILS_END_POINT;
-const secretToken = process.env.SECRET_TOKEN;
-const secretMerchantId =  process.env.MERCHANT_ID
+const {
+  PORT: port = 3000,
+  BASE_URL: baseURL,
+  CLIENT_ID: clientId,
+  TOKEN_END_POINT: tokenEndPoint,
+  USER_DETAILS_END_POINT: userDetailsEndPoint,
+  SECRET_TOKEN: secretToken,
+  MERCHANT_ID: secretMerchantId,
+} = process.env;
+
 
 app.use(express.json());
 // app.use(verify)
@@ -107,32 +110,31 @@ app.use(express.json());
 //     res.send(user)
 // })
 
-
-const verify =(err,req, res, next) =>{
-    if(req.path === "/login"){
-        console.log("login middleware");
-         verifyMerchant(req, res, next)
-    }else{
-        console.log("test middleware");
-        verifyToken(req, res, next)
-    }
-}
+const verify = (err, req, res, next) => {
+  if (req.path === "/login") {
+    console.log("login middleware");
+    verifyMerchant(req, res, next);
+  } else {
+    console.log("test middleware");
+    verifyToken(req, res, next);
+  }
+};
 
 const verifyMerchant = (req, res, next) => {
-    // console.log(req);
-    const {merchantid } = req.headers;
-    // console.log(req.headers);
-    if (!merchantid) return res.sendStatus(401)
-    if(merchantid === secretMerchantId) {
-        next()
-    }else{
-        res.sendStatus(403)
-    }
-}
+  // console.log(req);
+  const { merchantid } = req.headers;
+  // console.log(req.headers);
+  if (!merchantid) return res.sendStatus(401);
+  if (merchantid === secretMerchantId) {
+    next();
+  } else {
+    res.sendStatus(403);
+  }
+};
 
 const verifyToken = (req, res, next) => {
   const { authorization } = req.headers;
-  const token = authorization && authorization.split(' ')[1]
+  const token = authorization && authorization.split(" ")[1];
 
   if (token == null) return res.sendStatus(401);
 
@@ -143,12 +145,11 @@ const verifyToken = (req, res, next) => {
   });
 };
 
-app.use(verify)
-
+app.use(verify);
 
 const date = () => DateTime.now().toISO();
 
-const requestFunction = async (requestBody, path) => {
+const makeVodapayRequest = async (requestBody, path) => {
   const headers = {
     "Content-Type": "application/json; charset=UTF-8",
     "client-id": clientId,
@@ -176,17 +177,17 @@ app.post("/login", async (req, res) => {
     grantType: "AUTHORIZATION_CODE",
     authCode,
   });
-  const accessTokenResponse = await requestFunction(
+  const accessTokenResponse = await makeVodapayRequest(
     accessTokenBody,
     accessTokenPath
   );
-  const {accessToken} = accessTokenResponse;
+  const { accessToken } = accessTokenResponse;
 
   const userDetailsPath = `${baseURL}${userDetailsEndPoint}`;
   const userDetailsBody = JSON.stringify({
     accessToken,
   });
-  const userDetails = await requestFunction(userDetailsBody, userDetailsPath);
+  const userDetails = await makeVodapayRequest(userDetailsBody, userDetailsPath);
   const userInfo = userDetails;
 
   const jsonWebToken = jwt.sign(userInfo, secretToken);
@@ -197,8 +198,6 @@ app.post("/login", async (req, res) => {
 app.post("/test", verifyToken, (req, res) => {
   res.send("success");
 });
-
-
 
 app.listen(port, () => {
   console.log(`app listening on port: ${port}`);
