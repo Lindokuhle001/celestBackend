@@ -12,12 +12,11 @@ const {
   TOKEN_END_POINT: tokenEndPoint,
   USER_DETAILS_END_POINT: userDetailsEndPoint,
   SECRET_TOKEN: secretToken,
-  MERCHANT_ID: secretMerchantId,
+  // MERCHANT_ID: secretMerchantId,
 } = process.env;
-
-
+const {verify} = require("./services/middleware");
 app.use(express.json());
-// app.use(verify)
+app.use(verify)
 
 /* menu, user and price apis */
 // const maxTables = 10
@@ -110,42 +109,44 @@ app.use(express.json());
 //     res.send(user)
 // })
 
-const verify = (err, req, res, next) => {
-  if (req.path === "/login") {
-    console.log("login middleware");
-    verifyMerchant(req, res, next);
-  } else {
-    console.log("test middleware");
-    verifyToken(req, res, next);
-  }
-};
+// const verify = (req, res, next) => {
+//   if (req.path === "/login") {
+//     console.log("login middleware");
+//     verifyMerchant(req, res, next);
+//   } else {
+//     console.log("test middleware");
+//     verifyToken(req, res, next);
+//   }
+// };
 
-const verifyMerchant = (req, res, next) => {
-  // console.log(req);
-  const { merchantid } = req.headers;
-  // console.log(req.headers);
-  if (!merchantid) return res.sendStatus(401);
-  if (merchantid === secretMerchantId) {
-    next();
-  } else {
-    res.sendStatus(403);
-  }
-};
+// const verifyMerchant = (req, res, next) => {
+//   console.log("merchantid", req.headers["merchantid"]);
+//   const { merchantid } = req.headers;
+//   // console.log(req.headers);
+//   if (!merchantid) return res.sendStatus(401);
+//   if (merchantid === secretMerchantId) {
+//     next();
+//   } else {
+//     res.sendStatus(403);
+//   }
+// };
 
-const verifyToken = (req, res, next) => {
-  const { authorization } = req.headers;
-  const token = authorization && authorization.split(" ")[1];
+// const verifyToken = (req, res, next) => {
+//   console.log("token verification");
+//   const { authorization } = req.headers;
+//   const token = authorization && authorization.split(" ")[1];
 
-  if (token == null) return res.sendStatus(401);
+//   if (token == null) return res.sendStatus(401);
 
-  jwt.verify(token, secretToken, (err, user) => {
-    if (err) return res.sendStatus(403);
-    req.user = user;
-    next();
-  });
-};
+//   jwt.verify(token, secretToken, (err, user) => {
+//     if (err) return res.sendStatus(403);
+//     req.user = user;
+//     console.log("here");
+//   });
+//   next(); 
+// };
 
-app.use(verify);
+// app.use(verify);
 
 const date = () => DateTime.now().toISO();
 
@@ -170,7 +171,7 @@ const makeVodapayRequest = async (requestBody, path) => {
 
 app.post("/login", async (req, res) => {
   const { authCode } = req.body;
-  // console.log("login path");
+  console.log("login path");
 
   const accessTokenPath = `${baseURL}${tokenEndPoint}`;
   const accessTokenBody = JSON.stringify({
@@ -187,7 +188,10 @@ app.post("/login", async (req, res) => {
   const userDetailsBody = JSON.stringify({
     accessToken,
   });
-  const userDetails = await makeVodapayRequest(userDetailsBody, userDetailsPath);
+  const userDetails = await makeVodapayRequest(
+    userDetailsBody,
+    userDetailsPath
+  );
   const userInfo = userDetails;
 
   const jsonWebToken = jwt.sign(userInfo, secretToken);
@@ -195,7 +199,8 @@ app.post("/login", async (req, res) => {
   res.send(userInfo);
 });
 
-app.post("/test", verifyToken, (req, res) => {
+app.post("/test", (req, res) => {
+  console.log("test path");
   res.send("success");
 });
 
