@@ -1,22 +1,19 @@
 require("dotenv").config();
 const express = require("express");
-const axios = require("axios");
-const { DateTime } = require("luxon");
 const jwt = require("jsonwebtoken");
+const makeVodapayRequest = require("./services/helperFunctions");
+const { verify } = require("./services/middleware");
 
-const app = express();
 const {
   PORT: port = 3000,
   BASE_URL: baseURL,
-  CLIENT_ID: clientId,
   TOKEN_END_POINT: tokenEndPoint,
   USER_DETAILS_END_POINT: userDetailsEndPoint,
   SECRET_TOKEN: secretToken,
-  // MERCHANT_ID: secretMerchantId,
 } = process.env;
-const {verify} = require("./services/middleware");
+const app = express();
 app.use(express.json());
-app.use(verify)
+app.use(verify);
 
 /* menu, user and price apis */
 // const maxTables = 10
@@ -109,66 +106,6 @@ app.use(verify)
 //     res.send(user)
 // })
 
-// const verify = (req, res, next) => {
-//   if (req.path === "/login") {
-//     console.log("login middleware");
-//     verifyMerchant(req, res, next);
-//   } else {
-//     console.log("test middleware");
-//     verifyToken(req, res, next);
-//   }
-// };
-
-// const verifyMerchant = (req, res, next) => {
-//   console.log("merchantid", req.headers["merchantid"]);
-//   const { merchantid } = req.headers;
-//   // console.log(req.headers);
-//   if (!merchantid) return res.sendStatus(401);
-//   if (merchantid === secretMerchantId) {
-//     next();
-//   } else {
-//     res.sendStatus(403);
-//   }
-// };
-
-// const verifyToken = (req, res, next) => {
-//   console.log("token verification");
-//   const { authorization } = req.headers;
-//   const token = authorization && authorization.split(" ")[1];
-
-//   if (token == null) return res.sendStatus(401);
-
-//   jwt.verify(token, secretToken, (err, user) => {
-//     if (err) return res.sendStatus(403);
-//     req.user = user;
-//     console.log("here");
-//   });
-//   next(); 
-// };
-
-// app.use(verify);
-
-const date = () => DateTime.now().toISO();
-
-const makeVodapayRequest = async (requestBody, path) => {
-  const headers = {
-    "Content-Type": "application/json; charset=UTF-8",
-    "client-id": clientId,
-    "request-time": date(),
-    Signature: "algorithm=RSA256, keyVersion=1, signature=testing_signatur",
-  };
-
-  const options = {
-    method: "POST",
-    url: path,
-    headers,
-    data: requestBody,
-  };
-
-  const response = await axios(options);
-  return response.data;
-};
-
 app.post("/login", async (req, res) => {
   const { authCode } = req.body;
   console.log("login path");
@@ -195,8 +132,7 @@ app.post("/login", async (req, res) => {
   const userInfo = userDetails;
 
   const jsonWebToken = jwt.sign(userInfo, secretToken);
-  res.header("authorization", `${jsonWebToken}`);
-  res.send(userInfo);
+  res.send(userInfo, jsonWebToken);
 });
 
 app.post("/test", (req, res) => {
