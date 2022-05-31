@@ -1,5 +1,12 @@
 const axios = require("axios");
 const { DateTime } = require("luxon");
+const { CLIENT_ID: clientId } = process.env;
+const jwt = require("jsonwebtoken"); 
+
+const signToken = (userInfo, secretToken) => {
+  return jwt.sign(userInfo, secretToken);
+};
+
 const getRequestDate = () => DateTime.now().toISO();
 
 const makeVodapayRequest = async (requestBody, path) => {
@@ -21,4 +28,4 @@ const makeVodapayRequest = async (requestBody, path) => {
   return response.data;
 };
 
-module.exports = makeVodapayRequest;
+module.exports = { makeVodapayRequest, signToken };

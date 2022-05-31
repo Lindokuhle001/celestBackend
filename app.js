@@ -1,9 +1,7 @@
 require("dotenv").config();
 const express = require("express");
-const jwt = require("jsonwebtoken");
-const makeVodapayRequest = require("./services/helperFunctions");
+const { makeVodapayRequest, signToken } = require("./services/helperFunctions");
 const { verify } = require("./services/middleware");
-
 const {
   PORT: port = 3000,
   BASE_URL: baseURL,
@@ -11,6 +9,7 @@ const {
   USER_DETAILS_END_POINT: userDetailsEndPoint,
   SECRET_TOKEN: secretToken,
 } = process.env;
+
 const app = express();
 app.use(express.json());
 app.use(verify);
@@ -130,9 +129,8 @@ app.post("/login", async (req, res) => {
     userDetailsPath
   );
   const userInfo = userDetails;
-
-  const jsonWebToken = jwt.sign(userInfo, secretToken);
-  res.send(userInfo, jsonWebToken);
+  const jsonWebToken = signToken(userInfo, secretToken);
+  res.send({ userInfo, jsonWebToken });
 });
 
 app.post("/test", (req, res) => {

@@ -9,6 +9,9 @@ const {
 
 const verify = (req, res, next) => {
     console.log("verify");
+    const { merchantid } = req.body;
+    console.log(merchantid, secretMerchantId);
+
     if (req.path === "/login") {
       console.log("login middleware");
       verifyMerchant(req, res, next);
@@ -19,9 +22,9 @@ const verify = (req, res, next) => {
   };
   
   const verifyMerchant = (req, res, next) => {
-    // console.log(req);
-    const { merchantid } = req.headers;
-    // console.log(req.headers);
+    console.log("merchantId middleware");
+    const { merchantid } = req.body;
+    console.log(merchantid, secretMerchantId);
     if (!merchantid) return res.sendStatus(401);
     if (merchantid === secretMerchantId) {
       next();
