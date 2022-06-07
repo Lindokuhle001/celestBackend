@@ -28,4 +28,4 @@ const makeVodapayRequest = async (requestBody, path) => {
   return response.data;
 };
 
-module.exports = { makeVodapayRequest, signToken };
+module.exports = { makeVodapayRequest, signToken, getRequestDate };
