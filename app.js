@@ -1,15 +1,15 @@
 require("dotenv").config();
 const axios = require("axios");
-const fs = require('fs');
+const fs = require("fs");
 const express = require("express");
+const { verify } = require("./services/middleware");
+const crypto = require("crypto");
+const buffer = require("buffer");
 const {
   makeVodapayRequest,
   signToken,
   getRequestDate,
 } = require("./services/helperFunctions");
-const { verify } = require("./services/middleware");
-const crypto = require("crypto");
-const buffer = require('buffer');
 
 const {
   PORT: port = 3000,
@@ -21,8 +21,6 @@ const {
   // PRIVATE_KEY: privateKey,
   CLIENT_ID: clientId,
 } = process.env;
-
-
 
 const app = express();
 app.use(express.json());
@@ -206,49 +204,45 @@ app.post("/pay", async (req, res) => {
   //   },
   // });
   // const requestBody = req.body;
-  const requestBody = {
-    order: {
-      orderId: "OrderID_0101010101",
-      orderDescription: "sample_order",
-      orderAmount: {
-        value: "100",
-        currency: "JPY",
-      },
-    },
-    paymentAmount: {
-      value: "100",
-      currency: "JPY",
-    },
-    paymentFactor: {
-      isInStorePayment: "true",
-    },
-  };
+  // const requestBody = {
+  //   order: {
+  //     orderId: "OrderID_0101010101",
+  //     orderDescription: "sample_order",
+  //     orderAmount: {
+  //       value: "100",
+  //       currency: "JPY",
+  //     },
+  //   },
+  //   paymentAmount: {
+  //     value: "100",
+  //     currency: "JPY",
+  //   },
+  //   paymentFactor: {
+  //     isInStorePayment: "true",
+  //   },
+  // };
   const unsignedContent = `POST ${paymentEndPoint}
   ${clientId}.${getRequestDate()}.${requestBody}`;
 
+  fs.readFile("testCredentials/rsa_private_key.PEM", (err, key) => {
+    const privateKey = key;
+    // create key with crypto
+    // create signer with crypto RSA- SHA256
+    // write unsigned payload to the singer
+    // signature = signer sign with base 64
 
-
-  let privateKey
-fs.readFile('testCredentials/rsa_private_key.PEM', (err, key)=> {
-  privateKey = key
-
-  const data = Buffer.from(unsignedContent);
-  const sign = crypto.sign("SHA256", data , privateKey);
-  const signature = sign.toString('base64');
-  console.log(signature);
-});
-
-
-
-  
-
+    const data = Buffer.from(unsignedContent);
+    const sign = crypto.sign("SHA256", data, privateKey);
+    const signature = sign.toString("base64");
+    console.log(signature);
+  });
 
   // const signature = crypto
   //   .createHmac("sha256", privateKey)
   //   .update(unsignedContent)
   //   .digest("hex");
 
-    // console.log(signature);
+  //   console.log(signature);
 
   //   const headers = {
   //     "Content-Type": "application/json; charset=UTF-8",
@@ -256,17 +250,69 @@ fs.readFile('testCredentials/rsa_private_key.PEM', (err, key)=> {
   //     "request-time": getRequestDate(),
   //   Signature: `algorithm=RSA256, keyVersion=0, signature=${signature}`,
   // };
-  
+
   //   const options = {
   //     method: "POST",
   //     url: `${baseURL}${paymentEndPoint}`,
   //     headers,
   //     data: requestBody,
   //   };
-  
+
   //   const response = await axios(options);
   //   console.log(response);
+});
 
+// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+// const requestBody = {
+//   order: {
+//     orderId: "OrderID_0101010101",
+//     orderDescription: "sample_order",
+//     orderAmount: {
+//       value: "100",
+//       currency: "JPY",
+//     },
+//   },
+//   paymentAmount: {
+//     value: "100",
+//     currency: "JPY",
+//   },
+//   paymentFactor: {
+//     isInStorePayment: "true",
+//   },
+// };
+
+// const unsignedContent = `POST ${paymentEndPoint}
+// ${clientId}.${getRequestDate()}.${requestBody}`;
+
+// const { privateKey } = crypto.generateKeyPairSync("rsa", {
+//   modulusLength: 2048,
+// });
+
+// const data = Buffer.from(unsignedContent);
+// const sign = crypto.sign("SHA256", data, privateKey);
+// const signature = sign.toString("base64");
+// console.log(signature);
+
+// // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+app.post("/encription", async (req, res) => {
+  const requestBody = req.body;
+
+  const unsignedContent = `POST ${paymentEndPoint}
+  ${clientId}.${getRequestDate()}.${requestBody}`;
+
+  fs.readFile("testCredentials/rsa_private_key.PEM", (err, data) => {
+    if (err) throw err;
+
+    const privateKey = crypto.createPrivateKey(data);
+    const sign = crypto.createSign("RSA-SHA256");
+    sign.write(unsignedContent);
+    sign.end();
+    const signature = sign.sign(privateKey, "base64");
+    console.log(signature);
+    res.send(signature);
+  });
 });
 
 app.post("/test", (req, res) => {
