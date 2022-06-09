@@ -1,10 +1,13 @@
 require("dotenv").config();
-const axios = require("axios");
 const fs = require("fs");
-const express = require("express");
-const { verify } = require("./services/middleware");
 const crypto = require("crypto");
+const express = require("express");
+const { authorise } = require("./services/middleware");
 const { makeVodapayRequest, signToken } = require("./services/helperFunctions");
+
+const app = express();
+app.use(authorise);
+app.use(express.json());
 
 const {
   PORT: port = 3000,
@@ -13,12 +16,7 @@ const {
   USER_DETAILS_END_POINT: userDetailsEndPoint,
   SECRET_TOKEN: secretToken,
   PAYMENT_END_POINT: paymentEndPoint,
-  CLIENT_ID: clientId,
 } = process.env;
-
-const app = express();
-// app.use(verify);
-app.use(express.json());
 
 // menu, user and price apis
 // const maxTables = 10
@@ -113,8 +111,6 @@ app.use(express.json());
 
 app.post("/login", async (req, res) => {
   const { authCode } = req.body;
-  console.log("login path");
-  console.log(authCode, "clientId");
 
   const accessTokenPath = `${baseURL}${tokenEndPoint}`;
   const accessTokenBody = {
@@ -126,9 +122,7 @@ app.post("/login", async (req, res) => {
     accessTokenBody,
     accessTokenPath
   );
-  console.log("accessTokenResponse");
-  const { accessToken } = accessTokenResponse;
-  console.log("accessToken");
+  const { accessToken } = accessTokenResponse.data;
 
   const userDetailsPath = `${baseURL}${userDetailsEndPoint}`;
   const userDetailsBody = {
@@ -138,8 +132,7 @@ app.post("/login", async (req, res) => {
     userDetailsBody,
     userDetailsPath
   );
-  console.log(userDetails);
-  const userInfo = userDetails;
+  const userInfo = userDetails.data;
   const jsonWebToken = signToken(userInfo, secretToken);
   res.send({ userInfo, jsonWebToken });
 });
@@ -149,43 +142,8 @@ app.post("/pay", async (req, res) => {
   const requestBody = req.body;
 
   const response = await makeVodapayRequest(requestBody, path);
-  // console.log(response.data);
   res.send(response.data);
 });
-
-// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-
-// const requestBody = {
-//   order: {
-//     orderId: "OrderID_0101010101",
-//     orderDescription: "sample_order",
-//     orderAmount: {
-//       value: "100",
-//       currency: "JPY",
-//     },
-//   },
-//   paymentAmount: {
-//     value: "100",
-//     currency: "JPY",
-//   },
-//   paymentFactor: {
-//     isInStorePayment: "true",
-//   },
-// };
-
-// const unsignedContent = `POST ${paymentEndPoint}
-// ${clientId}.${getRequestDate()}.${requestBody}`;
-
-// const { privateKey } = crypto.generateKeyPairSync("rsa", {
-//   modulusLength: 2048,
-// });
-
-// const data = Buffer.from(unsignedContent);
-// const sign = crypto.sign("SHA256", data, privateKey);
-// const signature = sign.toString("base64");
-// console.log(signature);
-
-// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 app.post("/encription", async (req, res) => {
   const requestBody = req.body;
