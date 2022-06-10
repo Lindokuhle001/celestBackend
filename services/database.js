@@ -3,6 +3,8 @@ const getTable = (max) => {
   return Math.floor(Math.random() * max) + 1;
 };
 
+const noAuthPaths = ["/menu", "/price", "/orders", "/login"];
+
 const price = {
   perPersonCost: 126,
   table: getTable(maxTables),
@@ -35,4 +37,4 @@ const menu = [
   },
 ];
 
-module.exports = { menu, price, orders };
+module.exports = { menu, price, orders, noAuthPaths };

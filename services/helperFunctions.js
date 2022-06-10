@@ -1,13 +1,12 @@
 const axios = require("axios");
-const crypto = require("crypto");
-
+const { createPrivateKey, createSign } = require("crypto");
 const { DateTime } = require("luxon");
+const { sign } = require("jsonwebtoken");
+const { readFileSync } = require("fs");
 const { CLIENT_ID: clientId } = process.env;
-const jwt = require("jsonwebtoken");
-const fs = require("fs");
 
 const signToken = (userInfo, secretToken) => {
-  return jwt.sign(userInfo, secretToken);
+  return sign(userInfo, secretToken);
 };
 
 const getRequestDate = () => DateTime.now().toISO();
@@ -17,11 +16,9 @@ const getSignature = (requestBody, requestTime, endPoint) => {
     requestBody
   )}`;
 
-  // console.log(unsignedContent);
-  const key = fs.readFileSync("rsa_private_key.PEM", "utf8");
-
-  const privateKey = crypto.createPrivateKey(key);
-  const sign = crypto.createSign("RSA-SHA256");
+  const key = readFileSync("rsa_private_key.PEM", "utf8");
+  const privateKey = createPrivateKey(key);
+  const sign = createSign("RSA-SHA256");
   sign.write(unsignedContent);
   sign.end();
   const signature = sign.sign(privateKey, "base64");

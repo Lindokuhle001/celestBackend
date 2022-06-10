@@ -4,12 +4,11 @@ const jwt = require("jsonwebtoken");
 const { SECRET_TOKEN: secretToken, MERCHANT_ID: secretMerchantId } =
   process.env;
 
+const { noAuthPaths } = require("./database");
+
 const authorise = (req, res, next) => {
-  if (req.path === "/login") {
-    console.log("login middleware");
+  if (noAuthPaths.includes(req.path)) {
     verifyMerchant(req, res, next);
-  } else if (req.path === "/menu") {
-    next();
   } else {
     verifyToken(req, res, next);
   }
@@ -18,7 +17,6 @@ const authorise = (req, res, next) => {
 const verifyMerchant = (req, res, next) => {
   console.log("merchantId middleware");
   const { merchantid } = req.body;
-  console.log(merchantid, secretMerchantId);
   if (!merchantid) return res.sendStatus(401);
   if (merchantid === secretMerchantId) {
     next();

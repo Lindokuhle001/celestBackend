@@ -2,10 +2,11 @@ require("dotenv").config();
 const express = require("express");
 const { authorise } = require("./services/middleware");
 const { makeVodapayRequest, signToken } = require("./services/helperFunctions");
+let { menu, price, orders } = require("./services/database");
 
 const app = express();
-app.use(authorise);
 app.use(express.json());
+app.use(authorise);
 
 const {
   PORT: port = 3000,
@@ -15,7 +16,6 @@ const {
   SECRET_TOKEN: secretToken,
   PAYMENT_END_POINT: paymentEndPoint,
 } = process.env;
-let { menu, price, orders } = require("./services/database");
 
 app.get("/price", (req, res) => {
   res.send(price);
@@ -33,6 +33,7 @@ app.post("/orders", (req, res) => {
 });
 
 app.post("/login", async (req, res) => {
+  console.log(req.body);
   const { authCode } = req.body;
 
   const accessTokenPath = `${baseURL}${tokenEndPoint}`;
