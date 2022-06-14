@@ -22,7 +22,6 @@ const getSignature = (requestBody, requestTime, endPoint) => {
   sign.write(unsignedContent);
   sign.end();
   const signature = sign.sign(privateKey, "base64");
-  // console.log(signature);
   return signature;
 };
 
@@ -48,8 +47,8 @@ const makeVodapayRequest = async (requestBody, path) => {
   const response = await axios(options).catch((err) => {
     console.log(err);
   });
-  // console.log(response);
+
   return response;
 };
 
-module.exports = { makeVodapayRequest, signToken, getRequestDate };
+module.exports = { makeVodapayRequest, signToken };

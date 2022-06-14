@@ -1,10 +1,9 @@
 require("dotenv").config();
 const jwt = require("jsonwebtoken");
 
+const { noAuthPaths } = require("./database");
 const { SECRET_TOKEN: secretToken, MERCHANT_ID: secretMerchantId } =
   process.env;
-
-const { noAuthPaths } = require("./database");
 
 const authorise = (req, res, next) => {
   if (noAuthPaths.includes(req.path)) {

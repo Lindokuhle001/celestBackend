@@ -2,11 +2,11 @@ require("dotenv").config();
 const express = require("express");
 const { authorise } = require("./services/middleware");
 const { makeVodapayRequest, signToken } = require("./services/helperFunctions");
-let { menu, price, orders } = require("./services/database");
+const { menu, price, orders } = require("./services/database");
 
 const app = express();
 app.use(express.json());
-app.use(authorise);
+// app.use(authorise);
 
 const {
   PORT: port = 3000,
@@ -17,19 +17,18 @@ const {
   PAYMENT_END_POINT: paymentEndPoint,
 } = process.env;
 
-app.get("/price", (req, res) => {
+app.post("/price", (req, res) => {
   res.send(price);
 });
 
-app.get("/menu", (req, res) => {
+app.post("/menu", (req, res) => {
   res.send(menu);
 });
 
 app.post("/orders", (req, res) => {
   const newOrder = req.body;
   orders.push(newOrder);
-  console.log(orders);
-  res.send("price updated");
+  res.send("order recieved");
 });
 
 app.post("/login", async (req, res) => {
@@ -59,6 +58,10 @@ app.post("/login", async (req, res) => {
   const userInfo = userDetails.data;
   const jsonWebToken = signToken(userInfo, secretToken);
   res.send({ userInfo, jsonWebToken });
+});
+
+app.post("/payment-notification", async (req, res) => {
+  const notification = req.body;
 });
 
 app.post("/pay", async (req, res) => {
