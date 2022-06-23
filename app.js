@@ -6,7 +6,7 @@ const { menu, price, orders } = require("./services/database");
 
 const app = express();
 app.use(express.json());
-// app.use(authorise);
+app.use(authorise);
 
 const {
   PORT: port = 3000,
@@ -62,6 +62,7 @@ app.post("/login", async (req, res) => {
 
 app.post("/payment-notification", async (req, res) => {
   const notification = req.body;
+  // res.send(notification);
 });
 
 app.post("/pay", async (req, res) => {
@@ -69,6 +70,7 @@ app.post("/pay", async (req, res) => {
   const requestBody = req.body;
 
   const response = await makeVodapayRequest(requestBody, path);
+  console.log(response.data);
   res.send(response.data);
 });
 

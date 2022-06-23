@@ -7,6 +7,7 @@ const { SECRET_TOKEN: secretToken, MERCHANT_ID: secretMerchantId } =
 
 const authorise = (req, res, next) => {
   if (noAuthPaths.includes(req.path)) {
+    console.log("data", req.body.data);
     verifyMerchant(req, res, next);
   } else {
     verifyToken(req, res, next);
@@ -16,6 +17,7 @@ const authorise = (req, res, next) => {
 const verifyMerchant = (req, res, next) => {
   console.log("merchantId middleware");
   const { merchantid } = req.body;
+  console.log("merchntID", merchantid);
   if (!merchantid) return res.sendStatus(401);
   if (merchantid === secretMerchantId) {
     next();

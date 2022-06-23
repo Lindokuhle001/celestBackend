@@ -3,7 +3,7 @@ const getTable = (max) => {
   return Math.floor(Math.random() * max) + 1;
 };
 
-const noAuthPaths = ["/menu", "/price", "/orders", "/login"];
+const noAuthPaths = ["/menu", "/price", "/login"];
 
 const price = {
   perPersonCost: 126,

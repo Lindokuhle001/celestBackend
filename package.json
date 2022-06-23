@@ -1,13 +1,14 @@
 {
   "name": "celesteapi",
   "version": "1.0.0",
-  "description": "",
+  "description": "celesteApi",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": " nodemon app.js"
+    "start": "node app.js",
+    "dev":"nodemon app.js"
   },
-  "author": "",
+  "author": "lindo",
   "license": "ISC",
   "dependencies": {
     "axios": "^0.27.2",
