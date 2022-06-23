@@ -1,13 +1,23 @@
 const maxTables = 10;
-const getTable = (max) => {
-  return Math.floor(Math.random() * max) + 1;
+const availableTables = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+const getTable = () => {
+  const table = Math.floor(Math.random() * availableTables.length) + 1;
+  availableTables.splice(table, 1);
+  return availableTables[table];
 };
+
+// const availableTables = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+// const getTable = () => {
+//   const table = Math.floor(Math.random() * availableTables.length) + 1;
+//   availableTables.splice(table, 1);
+//   return availableTables[table];
+// };
 
 const noAuthPaths = ["/menu", "/price", "/login"];
 
 const price = {
   perPersonCost: 126,
-  table: getTable(maxTables),
+  table: getTable(),
   maxNumberOfPeople: 4,
 };
 
