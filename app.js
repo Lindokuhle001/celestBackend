@@ -71,8 +71,8 @@ app.post("/pay", async (req, res) => {
   const requestBody = req.body;
 
   const response = await makeVodapayRequest(requestBody, path);
-  console.log(response.data);
-  res.send(response.data);
+  // console.log(response.data);
+  // res.send(response.data);
 });
 
 app.listen(port, () => {
