@@ -61,8 +61,9 @@ app.post("/login", async (req, res) => {
 });
 
 app.post("/payment-notification", async (req, res) => {
-  const notification = req.body;
-  res.send(notification);
+  console.log(req.body);
+  // const notification = req.body;
+  // res.send(notification);
 });
 
 app.post("/pay", async (req, res) => {
