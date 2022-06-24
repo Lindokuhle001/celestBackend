@@ -12,7 +12,7 @@ const getTable = () => {
 //   availableTables.splice(table, 1);
 //   return availableTables[table];
 // };
-// restarting heroku
+// restarting heroku server
 
 const noAuthPaths = ["/menu", "/price", "/login"];
 
