@@ -1,9 +1,6 @@
 const maxTables = 10;
-const availableTables = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 const getTable = () => {
-  const table = Math.floor(Math.random() * availableTables.length) + 1;
-  availableTables.splice(table, 1);
-  return availableTables[table];
+  return Math.floor(Math.random() * maxTables) + 1;
 };
 
 // const availableTables = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
@@ -12,9 +9,8 @@ const getTable = () => {
 //   availableTables.splice(table, 1);
 //   return availableTables[table];
 // };
-// restarting heroku server
 
-const noAuthPaths = ["/menu", "/price", "/login"];
+const basicAuthPaths = ["/menu", "/price", "/login"];
 
 const price = {
   perPersonCost: 126,
@@ -48,4 +44,4 @@ const menu = [
   },
 ];
 
-module.exports = { menu, price, orders, noAuthPaths };
+module.exports = { menu, price, orders, basicAuthPaths };

@@ -45,7 +45,7 @@ const makeVodapayRequest = async (requestBody, path) => {
   };
 
   const response = await axios(options).catch((err) => {
-    console.log(err);
+    console.log(err.message);
   });
 
   return response;

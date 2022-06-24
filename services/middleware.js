@@ -1,23 +1,20 @@
 require("dotenv").config();
 const jwt = require("jsonwebtoken");
 
-const { noAuthPaths } = require("./database");
+const { basicAuthPaths } = require("./database");
 const { SECRET_TOKEN: secretToken, MERCHANT_ID: secretMerchantId } =
   process.env;
 
 const authorise = (req, res, next) => {
-  if (noAuthPaths.includes(req.path)) {
-    console.log("data", req.body.data);
+  if (basicAuthPaths.includes(req.path)) {
     verifyMerchant(req, res, next);
-  } else {
+  } else if (req.path === "/pay") {
     verifyToken(req, res, next);
   }
 };
 
 const verifyMerchant = (req, res, next) => {
-  console.log("merchantId middleware");
   const { merchantid } = req.body;
-  console.log("merchntID", merchantid);
   if (!merchantid) return res.sendStatus(401);
   if (merchantid === secretMerchantId) {
     next();
@@ -27,7 +24,6 @@ const verifyMerchant = (req, res, next) => {
 };
 
 const verifyToken = (req, res, next) => {
-  console.log("verify token");
   const { authorization } = req.headers;
   const token = authorization && authorization.split(" ")[1];
 

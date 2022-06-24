@@ -2,7 +2,8 @@ require("dotenv").config();
 const express = require("express");
 const { authorise } = require("./services/middleware");
 const { makeVodapayRequest, signToken } = require("./services/helperFunctions");
-const { menu, price, orders } = require("./services/database");
+const { menu, price } = require("./services/database");
+const { createOrder } = require("./services/orderFunction");
 
 const app = express();
 app.use(express.json());
@@ -23,12 +24,6 @@ app.post("/price", (req, res) => {
 
 app.post("/menu", (req, res) => {
   res.send(menu);
-});
-
-app.post("/orders", (req, res) => {
-  const newOrder = req.body;
-  orders.push(newOrder);
-  res.send("order recieved");
 });
 
 app.post("/login", async (req, res) => {
@@ -61,18 +56,17 @@ app.post("/login", async (req, res) => {
 });
 
 app.post("/payment-notification", async (req, res) => {
-  console.log(req.body);
+  console.log(req.body.data);
   // const notification = req.body;
   // res.send(notification);
 });
 
 app.post("/pay", async (req, res) => {
   const path = `${baseURL}${paymentEndPoint}`;
-  const requestBody = req.body;
-  console.log("response.data");
+  const { referenceBuyerId, orderDescription, value } = req.body;
+  const order = createOrder(referenceBuyerId, orderDescription, value);
 
-  const response = await makeVodapayRequest(requestBody, path);
-  console.log(response.data);
+  const response = await makeVodapayRequest(order, path);
   res.send(response.data);
 });
 
