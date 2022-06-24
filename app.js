@@ -69,10 +69,11 @@ app.post("/payment-notification", async (req, res) => {
 app.post("/pay", async (req, res) => {
   const path = `${baseURL}${paymentEndPoint}`;
   const requestBody = req.body;
+  console.log("response.data");
 
   const response = await makeVodapayRequest(requestBody, path);
-  // console.log(response.data);
-  // res.send(response.data);
+  console.log(response.data);
+  res.send(response.data);
 });
 
 app.listen(port, () => {
