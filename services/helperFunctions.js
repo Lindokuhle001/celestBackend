@@ -1,15 +1,13 @@
 const axios = require("axios");
 const { createPrivateKey, createSign } = require("crypto");
-const { DateTime } = require("luxon");
 const { sign } = require("jsonwebtoken");
 const { readFileSync } = require("fs");
+const { getRequestDate } = require("./dateFunctions");
 const { CLIENT_ID: clientId } = process.env;
 
 const signToken = (userInfo, secretToken) => {
   return sign(userInfo, secretToken);
 };
-
-const getRequestDate = () => DateTime.now().toISO();
 
 const getSignature = (requestBody, requestTime, endPoint) => {
   const unsignedContent = `POST ${endPoint}\n${clientId}.${requestTime}.${JSON.stringify(

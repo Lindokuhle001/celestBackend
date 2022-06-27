@@ -1,7 +1,7 @@
 require("dotenv").config();
 const jwt = require("jsonwebtoken");
 
-const { basicAuthPaths } = require("./database");
+const { basicAuthPaths } = require("../model/database");
 const { SECRET_TOKEN: secretToken, MERCHANT_ID: secretMerchantId } =
   process.env;
 

@@ -1,9 +1,5 @@
-const { DateTime } = require("luxon");
 const { v4: uuidv4 } = require("uuid");
-
-const getPaymentExpiryTime = () => {
-  return DateTime.now().plus({ weeks: 1 }).toISO();
-};
+const { getPaymentExpiryTime } = require("./dateFunctions");
 
 const createOrder = (referenceBuyerId, orderDescription, value) => {
   return {
