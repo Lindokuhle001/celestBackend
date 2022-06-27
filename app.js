@@ -13,14 +13,7 @@ const app = express();
 app.use(express.json());
 app.use(authorise);
 
-const {
-  PORT: port = 3000,
-  BASE_URL: baseURL,
-  TOKEN_END_POINT: tokenEndPoint,
-  USER_DETAILS_END_POINT: userDetailsEndPoint,
-  SECRET_TOKEN: secretToken,
-  PAYMENT_END_POINT: paymentEndPoint,
-} = process.env;
+const { PORT: port = 3000 } = process.env;
 
 app.post("/price", priceController);
 

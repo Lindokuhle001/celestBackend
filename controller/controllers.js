@@ -4,6 +4,15 @@ const { signToken } = require("../services/signToken");
 const { menu, price } = require("../model/database");
 const { createOrder } = require("../services/orderFunction");
 
+const {
+  PORT: port = 3000,
+  BASE_URL: baseURL,
+  TOKEN_END_POINT: tokenEndPoint,
+  USER_DETAILS_END_POINT: userDetailsEndPoint,
+  SECRET_TOKEN: secretToken,
+  PAYMENT_END_POINT: paymentEndPoint,
+} = process.env;
+
 const priceController = (req, res) => {
   res.send(price);
 };

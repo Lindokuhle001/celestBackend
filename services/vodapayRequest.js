@@ -1,5 +1,6 @@
 const axios = require("axios");
 const { getRequestDate } = require("./dateFunctions");
+const { getSignature } = require("./signature");
 const { CLIENT_ID: clientId } = process.env;
 
 const makeVodapayRequest = async (requestBody, path) => {
