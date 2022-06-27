@@ -1,7 +1,8 @@
 require("dotenv").config();
-const { makeVodapayRequest, signToken } = require("./services/helperFunctions");
-const { menu, price } = require("./model/database");
-const { createOrder } = require("./services/orderFunction");
+const { makeVodapayRequest } = require("../services/vodapayRequest");
+const { signToken } = require("../services/signToken");
+const { menu, price } = require("../model/database");
+const { createOrder } = require("../services/orderFunction");
 
 const priceController = (req, res) => {
   res.send(price);

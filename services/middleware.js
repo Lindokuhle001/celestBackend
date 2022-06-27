@@ -1,7 +1,6 @@
 require("dotenv").config();
-const jwt = require("jsonwebtoken");
-
 const { basicAuthPaths } = require("../model/database");
+const { verifyJwt } = require("./signToken");
 const { SECRET_TOKEN: secretToken, MERCHANT_ID: secretMerchantId } =
   process.env;
 
@@ -28,12 +27,7 @@ const verifyToken = (req, res, next) => {
   const token = authorization && authorization.split(" ")[1];
 
   if (token == null) return res.sendStatus(401);
-
-  jwt.verify(token, secretToken, (err, user) => {
-    if (err) return res.sendStatus(403);
-    req.user = user;
-    next();
-  });
+  verifyJwt(token, secretToken, next);
 };
 
 module.exports = { authorise };
