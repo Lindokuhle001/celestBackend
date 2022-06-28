@@ -2,6 +2,7 @@ const { v4: uuidv4 } = require("uuid");
 const { getPaymentExpiryTime } = require("./dateFunctions");
 
 const createOrder = (referenceBuyerId, orderDescription, value) => {
+  value = value * 100;
   return {
     productCode: "CASHIER_PAYMENT",
     salesCode: "51051000101000000011",
