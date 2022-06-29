@@ -27,7 +27,7 @@ const verifyToken = (req, res, next) => {
   const token = authorization && authorization.split(" ")[1];
 
   if (token == null) return res.sendStatus(401);
-  verifyJwt(token, secretToken, next);
+  verifyJwt(token, secretToken, next, res);
 };
 
 module.exports = { authorise };

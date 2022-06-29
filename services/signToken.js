@@ -1,14 +1,14 @@
 const { sign, verify } = require("jsonwebtoken");
 
-const signToken = (userInfo, secretToken) => {
+const getJwt = (userInfo, secretToken) => {
   return sign(userInfo, secretToken);
 };
 
-const verifyJwt = (token, secretToken, next) => {
+const verifyJwt = (token, secretToken, next, res) => {
   verify(token, secretToken, (err) => {
     if (err) return res.sendStatus(403);
     next();
   });
 };
 
-module.exports = { signToken, verifyJwt };
+module.exports = { getJwt, verifyJwt };

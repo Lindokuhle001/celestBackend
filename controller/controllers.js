@@ -1,6 +1,6 @@
 require("dotenv").config();
 const { makeVodapayRequest } = require("../services/vodapayRequest");
-const { signToken } = require("../services/signToken");
+const { getJwt } = require("../services/signToken");
 const { menu, price } = require("../model/database");
 const { createOrder } = require("../services/orderFunction");
 
@@ -40,13 +40,10 @@ const loginController = async (req, res) => {
   const userDetailsBody = {
     accessToken,
   };
-  const userDetails = await makeVodapayRequest(
-    userDetailsBody,
-    userDetailsPath
-  );
-  const userInfo = userDetails.data;
-  const jsonWebToken = signToken(userInfo, secretToken);
-  res.send({ userInfo, jsonWebToken });
+  let userDetails = await makeVodapayRequest(userDetailsBody, userDetailsPath);
+  userDetails = userDetails.data;
+  const jsonWebToken = getJwt(userDetails, secretToken);
+  res.send({ userDetails, jsonWebToken });
 };
 
 const paymentNotificationController = async (req, res) => {
